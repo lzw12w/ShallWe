@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>shallwe · 播客工作室</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Archivo:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <span class="lamp" aria-hidden="true"></span>
+        <span class="side-word">ShallWe</span>
+      </div>
+      <button id="new-btn" class="side-new">
+        <span class="side-new-plus" aria-hidden="true">+</span> 创建播客
+      </button>
+      <div class="side-lib-head">往期播客</div>
+      <ul id="library-list" class="library-list"></ul>
+      <p id="library-empty" class="lib-empty">还没有往期播客</p>
+    </aside>
+
+    <div class="main-col">
+  <header class="masthead">
+    <div class="brand">
+      <span class="lamp" id="onair-lamp" aria-hidden="true"></span>
+      <div class="wordmark">
+        <span class="wm-line">Shall</span><span class="wm-line accent">We</span>
+      </div>
+    </div>
+    <p class="tagline">把任何一篇文章，说成一档<em>可以随时插话</em>的播客</p>
+    <div class="freq-strip" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </header>
+
+  <section id="input-view" class="stage">
+    <div class="stage-index"><span class="idx-num">01</span><span class="idx-label">选题</span></div>
+    <div class="stage-body">
+      <h2 class="stage-title">投喂素材</h2>
+      <div id="dropzone" class="dropzone">
+        <div class="dz-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        </div>
+        <p class="dz-lead">把文件拖到这里</p>
+        <label class="dz-browse">选择文件<input type="file" id="file" accept=".txt,.md,.pdf,.docx" /></label>
+        <p class="hint">TXT · MD · PDF · DOCX</p>
+      </div>
+      <div class="divider"><span>也可以</span></div>
+      <div class="url-row">
+        <input type="url" id="url" placeholder="粘贴文章链接  https://…" />
+      </div>
+      <button id="gen-btn" class="primary big">开始录制 <span class="btn-arrow" aria-hidden="true">&#8594;</span></button>
+      <div id="status" class="status" role="status"></div>
+    </div>
+  </section>
+
+  <section id="player-view" class="stage player-stage hidden">
+    <div class="deck">
+      <div class="deck-top">
+        <span class="deck-status" id="deck-status">待播</span>
+        <span id="seg-counter" class="counter">0 / 0</span>
+      </div>
+
+      <!-- 中央焦点区 -->
+      <div class="focus" id="focus">
+        <!-- 播放态：居中当前段落，切换时向上淡出、新段自下浮现 -->
+        <div class="now-stack" id="now-stack">
+          <article class="now-card" id="now-card">
+            <span class="badge" id="now-badge"></span>
+            <div class="now-text" id="now-viewport"><p class="now-scroll" id="now-playing"></p></div>
+          </article>
+        </div>
+
+        <!-- 小波形，位于文字下方 -->
+        <div class="wave wave-sm" id="wave" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- 生成态：中央实时工具日志（生成中显示，完成后转移到底部） -->
+        <div class="live-log hidden" id="thinking-live">
+          <div class="live-log-head">
+            <span class="thinking-dot" aria-hidden="true"></span>
+            <span class="live-log-title" id="thinking-live-title">正在生成…</span>
+          </div>
+          <ul id="thinking-steps-live" class="live-steps"></ul>
+        </div>
+      </div>
+
+      <div class="scrubber" id="scrubber">
+        <span class="time" id="time-elapsed">0:00</span>
+        <div class="track" id="seek-track" role="slider" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="track-fill" id="seek-fill"></div>
+          <div class="track-knob" id="seek-knob"></div>
+        </div>
+        <span class="time" id="time-total">0:00</span>
+      </div>
+
+      <div class="controls">
+        <button id="prev-btn" class="ctl" title="上一段" aria-label="上一段">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14l-11-7z"/></svg>
+        </button>
+        <button id="play-btn" class="ctl play" title="播放/暂停" aria-label="播放或暂停">&#9654;</button>
+        <button id="next-btn" class="ctl" title="下一段" aria-label="下一段">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="interrupt-bar">
+      <label class="ib-tag" aria-hidden="true">插话</label>
+      <input type="text" id="interrupt-input" placeholder="提个问题，或引导后续重点：多讲讲 X · 跳过 Y · 更深入…" />
+      <button id="ask-btn" class="pill ask">提问</button>
+      <button id="steer-btn" class="pill steer">引导重点</button>
+    </div>
+
+    <!-- 底部可展开工具历史（生成完成后） -->
+    <div id="thinking-panel" class="thinking-panel hidden">
+      <div class="thinking-header">
+        <span class="thinking-dot" aria-hidden="true"></span>
+        <span class="thinking-title">控制台 · Agent 工作日志</span>
+        <span class="thinking-count" id="thinking-count"></span>
+        <button id="thinking-toggle" class="thinking-toggle collapsed" title="折叠/展开" aria-label="折叠或展开">&#9660;</button>
+      </div>
+      <ul id="thinking-steps" class="thinking-steps collapsed"></ul>
+    </div>
+
+    <div class="transcript">
+      <h3 class="transcript-title">逐字稿 <span class="tt-rule" aria-hidden="true"></span></h3>
+      <ul id="segment-list"></ul>
+    </div>
+  </section>
+
+  <footer class="footsig">
+    <span>shallwe</span><span class="dot">·</span><span>on air</span>
+  </footer>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
