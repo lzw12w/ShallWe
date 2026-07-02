@@ -1,4 +1,5 @@
 # 播客生成 Agent
+<img width="3449" height="1922" alt="image" src="https://github.com/user-attachments/assets/53c5574f-08a5-4375-909d-18ec95f64ee5" />
 
 上传文件或粘贴文章链接 → 自动生成播客 → 播放过程中可**随时打断提问或掌控后续重点**。
 
